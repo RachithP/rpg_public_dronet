@@ -29,8 +29,8 @@ class MyCallback(keras.callbacks.Callback):
         self.model.beta.load(np.maximum(0.0, 1.0-np.exp(-1.0/10.0*(epoch-10))), sess)
         self.model.alpha.load(1.0, sess)
 
-        print(self.model.alpha.eval(sess))
-        print(self.model.beta.eval(sess))
+        print("alpha = ", self.model.alpha.eval(sess))
+        print("beta = ", self.model.beta.eval(sess))
 
 
     def on_epoch_end(self, epoch, logs={}):
@@ -39,7 +39,8 @@ class MyCallback(keras.callbacks.Callback):
         logz.log_tabular('train_loss', logs.get('loss'))
         logz.log_tabular('val_loss', logs.get('val_loss'))
         logz.dump_tabular()
-
+        print("learning_rate = ", K.eval(self.model.optimizer.lr))
+            
         # Save model every 'period' epochs
         if (epoch+1) % self.period == 0:
             filename = self.filepath + '/model_weights_' + str(epoch) + '.h5'
