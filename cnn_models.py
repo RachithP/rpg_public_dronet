@@ -91,3 +91,75 @@ def resnet8(img_width, img_height, img_channels, output_dim):
     print(model.summary())
 
     return model
+
+def vgg(img_width, img_height, img_channels, output_dim):
+    """
+    Define model architecture.
+    
+    # Arguments
+       img_width: Target image widht.
+       img_height: Target image height.
+       img_channels: Target image channels.
+       output_dim: Dimension of model output.
+       
+    # Returns
+       model: A Model instance.
+    """
+
+    # Input
+    img_input = Input(shape=(img_height, img_width, img_channels))
+    
+    # Block -1 
+    x1 = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv_1_block_1',
+               kernel_initializer="he_normal", 
+                kernel_regularizer=regularizers.l2(1e-4))(img_input)
+    x1 = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv_2_block_1',
+               kernel_initializer="he_normal", 
+                kernel_regularizer=regularizers.l2(1e-4))(x1)
+    x1 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_1')(x1)
+
+    # Block -2
+    x2 = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv_1_block_2',
+               kernel_initializer="he_normal", 
+                kernel_regularizer=regularizers.l2(1e-4))(x1)
+    x2 = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv_2_block_2',
+               kernel_initializer="he_normal", 
+                kernel_regularizer=regularizers.l2(1e-4))(x2)
+    x2 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_2')(x2)
+    
+    # Block - 3
+    x3 = Conv2D(256, (3, 3), activation='relu', padding='same', name='conv_1_block_3',
+               kernel_initializer="he_normal", 
+                kernel_regularizer=regularizers.l2(1e-4))(x2)
+    x3 = Conv2D(256, (3, 3), activation='relu', padding='same', name='conv_2_block_3',
+               kernel_initializer="he_normal", 
+                kernel_regularizer=regularizers.l2(1e-4))(x3)
+    x3 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_1')(x3)
+    
+    # Block - 4
+#     x4 = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv_1_block_4',
+#                kernel_initializer="he_normal", 
+#                 kernel_regularizer=regularizers.l2(1e-4))(x3)
+#     x4 = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv_2_block_4',
+#                kernel_initializer="he_normal", 
+#                 kernel_regularizer=regularizers.l2(1e-4))(x4)
+#     x4 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_1')(x4)
+
+    x = Flatten(name='fc1')(x3)
+    x = Dropout(0.5)(x)
+
+    x = layers.Dense(1024, activation='relu', name='fc2')(x)
+    x = Dropout(0.5)(x)
+    
+    # Steering channel
+    steer = Dense(output_dim)(x)
+
+    # Collision channel
+    coll = Dense(output_dim)(x)
+    coll = Activation('sigmoid')(coll)
+
+    # Define steering-collision model
+    model = Model(inputs=[img_input], outputs=[steer, coll])
+    print(model.summary())
+
+    return model
