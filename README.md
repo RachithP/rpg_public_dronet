@@ -1,3 +1,6 @@
+# Commands to run training using screen
+`screen -md bash -c "python cnn.py --experiment_rootdir='./model/<directory> --train_dir='../../dronet/datasets/training' --val_dir='../../dronet/datasets/validation' --batch_size=16 --epochs=100 --log_rate=1 >> model/<directory>/training_progress.txt"`
+
 # DroNet: Learning to fly by driving
 This repository contains the code used to train and evaluate DroNet, a convolutional neural network that can safely drive a drone along the streets of a city.
 
