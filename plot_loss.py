@@ -18,12 +18,14 @@ def _main():
 
     train_loss = log['train_loss']
     val_loss = log['val_loss']
+    dense_1_loss = log['dense_1_loss']
+    activation_1_loss = log['activation_1_loss']
     timesteps = list(range(train_loss.shape[0]))
     
     # Plot losses
-    plt.plot(timesteps, train_loss, 'r--', timesteps, val_loss, 'b--')
-    plt.legend(["Training loss", "Validation loss"])
-    plt.ylabel('Loss')
+    plt.plot(timesteps, train_loss, 'r-', timesteps, val_loss, 'b-', timesteps, dense_1_loss, 'k-', timesteps, activation_1_loss, 'g-')
+    plt.legend(["Training loss", "Validation loss", "Regression loss", "classification loss"])
+    plt.ylabel('Losses')
     plt.xlabel('Epochs')
     plt.show()
     plt.savefig(os.path.join(FLAGS.experiment_rootdir, "log.png"))
