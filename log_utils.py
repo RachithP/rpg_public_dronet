@@ -22,27 +22,30 @@ class MyCallback(keras.callbacks.Callback):
         self.batch_size = batch_size
         
 
-    def on_epoch_begin(self, epoch, logs=None):
+    def on_epoch_begin(self, epoch, logs={}):
         
         # Decrease weight for binary cross-entropy loss
-        beta_epoch = 1      # Epochs after which beta loss kicks in
+        beta_epoch = 10      # Epochs after which beta loss kicks in
         sess = K.get_session()
         self.model.beta.load(np.maximum(0.0, 1.0-np.exp(-1.0/beta_epoch*(epoch-beta_epoch))), sess)
         self.model.alpha.load(1.0, sess)
 
         print("alpha = ", self.model.alpha.eval(sess))
         print("beta = ", self.model.beta.eval(sess))
-        self.scheduler(self.model, epoch, beta_epoch, new_lr=0.0001)        # Change new_lr 
+        # self.scheduler(epoch, beta_epoch, new_lr=0.000000001)        # Change new_lr 
         print("Learning Rate = ", K.get_value(self.model.optimizer.lr))
-
 
     def on_epoch_end(self, epoch, logs={}):
         
         # Save training and validation losses
         logz.log_tabular('train_loss', logs.get('loss'))
         logz.log_tabular('val_loss', logs.get('val_loss'))
+        logz.log_tabular('dense_1_loss', logs.get('dense_1_loss'))
+        logz.log_tabular('activation_1_loss', logs.get('activation_1_loss'))
+        logs.log_tabular('beta', K.get_value(self.model.beta))
+        logs.log_tabular('alpha', K.get_value(self.model.alpha))
+        logs.log_tabular('learning_rate', K.get_value(self.model.optimizer.lr))
         logz.dump_tabular()
-        print("learning_rate = ", K.eval(self.model.optimizer.lr))
             
         # Save model every 'period' epochs
         if (epoch+1) % self.period == 0:
@@ -58,8 +61,6 @@ class MyCallback(keras.callbacks.Callback):
         self.model.k_entropy.load(int(np.round(entropy_function)), sess)
 
     # Changing learning rate after beta loss is kicked in
-    def scheduler(self, model, epoch, beta_epoch, new_lr):
+    def scheduler(self, epoch, beta_epoch, new_lr):
         if epoch==beta_epoch:
-            K.set_value(model.optimizer.lr, new_lr)
-        
-    
+            K.set_value(self.model.optimizer.lr, new_lr) 
