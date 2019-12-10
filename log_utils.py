@@ -33,7 +33,6 @@ class MyCallback(keras.callbacks.Callback):
         print("alpha = ", self.model.alpha.eval(sess))
         print("beta = ", self.model.beta.eval(sess))
         # self.scheduler(epoch, beta_epoch, new_lr=0.000000001)        # Change new_lr 
-        print("Learning Rate = ", K.get_value(self.model.optimizer.lr))
 
     def on_epoch_end(self, epoch, logs={}):
         
@@ -44,7 +43,14 @@ class MyCallback(keras.callbacks.Callback):
         logz.log_tabular('activation_1_loss', logs.get('activation_1_loss'))
         logs.log_tabular('beta', K.get_value(self.model.beta))
         logs.log_tabular('alpha', K.get_value(self.model.alpha))
-        logs.log_tabular('learning_rate', K.get_value(self.model.optimizer.lr))
+        # Track the learning rate updates
+        lr = self.model.optimizer.lr
+        decay = self.model.optimizer.decay
+        iterations = self.model.optimizer.iterations
+        lr_with_decay = lr / (1. + decay * K.cast(iterations, K.dtype(decay))) 
+        logs.log_tabular('learning_rate', lr_with_decay))
+        print("Learning Rate = ", lr_with_decay))
+        # Dump all the values onto the log.txt file
         logz.dump_tabular()
             
         # Save model every 'period' epochs
