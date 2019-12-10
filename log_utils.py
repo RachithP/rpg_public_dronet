@@ -48,8 +48,8 @@ class MyCallback(keras.callbacks.Callback):
         decay = self.model.optimizer.decay
         iterations = self.model.optimizer.iterations
         lr_with_decay = lr / (1. + decay * K.cast(iterations, K.dtype(decay))) 
-        logs.log_tabular('learning_rate', lr_with_decay))
-        print("Learning Rate = ", lr_with_decay))
+        logs.log_tabular('learning_rate', lr_with_decay)
+        print("Learning Rate = ", lr_with_decay)
         # Dump all the values onto the log.txt file
         logz.dump_tabular()
             
