@@ -78,9 +78,10 @@ def evaluate_regression(predictions, real_values, fname):
     rmse = compute_rmse(predictions, real_values)
     highest_errors = compute_highest_regression_errors(predictions, real_values,
             n_errors=20)
-    dictionary = {"evas": evas.tolist(), "rmse": rmse.tolist(),
-                  "highest_errors": highest_errors.tolist()}
-    utils.write_to_file(dictionary, fname)
+    dictionary = {"evas": evas, "rmse": rmse,
+                  "highest_errors": highest_errors}
+    print("Results are :", dictionary)
+    # utils.write_to_file(dictionary, fname)
 
 
 # Functions to evaluate collision
