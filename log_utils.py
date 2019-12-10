@@ -26,7 +26,7 @@ class MyCallback(keras.callbacks.Callback):
         
         # Decrease weight for binary cross-entropy loss
         sess = K.get_session()
-        self.model.beta.load(np.maximum(0.0, 1.0-np.exp(-1.0/10.0*(epoch-10))), sess)
+        self.model.beta.load(np.maximum(0.0, 1.0-np.exp(-1.0/1.0*(epoch-1))), sess)
         self.model.alpha.load(1.0, sess)
 
         print("alpha = ", self.model.alpha.eval(sess))
