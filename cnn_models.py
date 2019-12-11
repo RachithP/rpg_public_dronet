@@ -4,7 +4,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten, Input
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers.merge import add
 from keras import regularizers
-from keras.applications.resnext import ResNeXt50, ResNet50
+from keras.applications.inception_v3 import InceptionV3
 
 def resnet8(img_width, img_height, img_channels, output_dim):
     """
@@ -163,7 +163,7 @@ def vgg(img_width, img_height, img_channels, output_dim):
 
     return model
 
-def resnext50(img_width, img_height, img_channels, output_dim):
+def inceptionv3(img_width, img_height, img_channels, output_dim):
     """
     Define model architecture.
     
@@ -181,13 +181,8 @@ def resnext50(img_width, img_height, img_channels, output_dim):
     #img_input = Input(shape=(img_height, img_width, img_channels))
     #cardinality = 32
     print("Image Channels : ", img_channels)
-    base_model = ResNeXt50(input_tensor=None,
-    					include_top=False,
+    base_model = InceptionV3(include_top=False,
     					weights='imagenet',
-                        backend= keras.backend,
-                        layers = keras.layers,
-                        models = keras.models,
-                        utils = keras.utils,
                        	input_shape=(img_height, img_width, img_channels))
 
     # Disbaling trainability of resnet feature extraction layers
