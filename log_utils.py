@@ -22,7 +22,7 @@ class MyCallback(keras.callbacks.Callback):
         self.batch_size = batch_size
         
 
-    def on_epoch_begin(self, epoch, logs={}):
+    def on_epoch_begin(self, epoch, logs=None):
         
         # Decrease weight for binary cross-entropy loss
         beta_epoch = 10      # Epochs after which beta loss kicks in
@@ -41,15 +41,15 @@ class MyCallback(keras.callbacks.Callback):
         logz.log_tabular('val_loss', logs.get('val_loss'))
         logz.log_tabular('dense_1_loss', logs.get('dense_1_loss'))
         logz.log_tabular('activation_1_loss', logs.get('activation_1_loss'))
-        logs.log_tabular('beta', K.get_value(self.model.beta))
-        logs.log_tabular('alpha', K.get_value(self.model.alpha))
+        logz.log_tabular('beta', K.get_value(self.model.beta))
+        logz.log_tabular('alpha', K.get_value(self.model.alpha))
         # Track the learning rate updates
         lr = self.model.optimizer.lr
         decay = self.model.optimizer.decay
         iterations = self.model.optimizer.iterations
         lr_with_decay = lr / (1. + decay * K.cast(iterations, K.dtype(decay))) 
-        logs.log_tabular('learning_rate', lr_with_decay)
-        print("Learning Rate = ", lr_with_decay)
+        logz.log_tabular('learning_rate', K.get_value(lr_with_decay))
+        print("Learning Rate = ", K.get_value(lr_with_decay))
         # Dump all the values onto the log.txt file
         logz.dump_tabular()
             
