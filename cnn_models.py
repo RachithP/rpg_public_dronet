@@ -1,6 +1,6 @@
 import keras
 from keras.models import Model
-from keras.layers import Dense, Dropout, Activation, Flatten, Input
+from keras.layers import Dense, Dropout, Activation, Flatten, Input, GlobalAveragePooling2D
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers.merge import add
 from keras import regularizers
@@ -178,8 +178,6 @@ def inceptionv3(img_width, img_height, img_channels, output_dim):
     """
 
     # Input
-    #img_input = Input(shape=(img_height, img_width, img_channels))
-    #cardinality = 32
     print("Image Channels : ", img_channels)
     base_model = InceptionV3(include_top=False,
     					weights='imagenet',
@@ -202,10 +200,8 @@ def inceptionv3(img_width, img_height, img_channels, output_dim):
         print(layer.name, filters.shape)
     ''' 
 
-    x7 = base_model.output
-    x = Flatten()(x7)
-    x = Activation('relu')(x)
-    x = Dropout(0.5)(x)
+    x = base_model.output
+    x = GlobalAveragePooling2D()(x)
 
     # Steering channel
     steer = Dense(output_dim)(x)
