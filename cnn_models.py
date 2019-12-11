@@ -1,7 +1,7 @@
 import keras
 from keras.models import Model
 from keras.layers import Dense, Dropout, Activation, Flatten, Input
-from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D
 from keras.layers.merge import add
 from keras import regularizers
 from keras.applications.inception_v3 import InceptionV3
@@ -91,7 +91,7 @@ def resnet8(img_width, img_height, img_channels, output_dim):
 
     return model
 
-def vgg(img_width, img_height, img_channels, output_dim):
+def three_block_model(img_width, img_height, img_channels, output_dim):
     """
     Define model architecture.
     
@@ -109,28 +109,28 @@ def vgg(img_width, img_height, img_channels, output_dim):
     img_input = Input(shape=(img_height, img_width, img_channels))
     
     # Block -1 
-    x1 = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv_1_block_1',
+    x1 = Conv2D(32, (7, 7), activation='relu', padding='same', name='conv_1_block_1',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(img_input)
-    x1 = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv_2_block_1',
+    x1 = Conv2D(32, (7, 7), activation='relu', padding='same', name='conv_2_block_1',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x1)
     x1 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_1')(x1)
 
     # Block -2
-    x2 = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv_1_block_2',
+    x2 = Conv2D(64, (5, 5), activation='relu', padding='same', name='conv_1_block_2',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x1)
-    x2 = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv_2_block_2',
+    x2 = Conv2D(64, (5, 5), activation='relu', padding='same', name='conv_2_block_2',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x2)
     x2 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_2')(x2)
     
     # Block - 3
-    x3 = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv_1_block_3',
+    x3 = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv_1_block_3',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x2)
-    x3 = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv_2_block_3',
+    x3 = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv_2_block_3',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x3)
     x3 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_3')(x3)
@@ -147,14 +147,16 @@ def vgg(img_width, img_height, img_channels, output_dim):
     x = Flatten(name='fc1')(x3)
     x = Dropout(0.5)(x)
 
-    x = Dense(1024, activation='relu', name='fc2')(x)
-    x = Dropout(0.5)(x)
+    x1 = Dense(512, activation='relu', name='fc2')(x)
+    x1 = Dropout(0.5)(x1)
     
     # Steering channel
-    steer = Dense(output_dim)(x)
+    steer = Dense(output_dim)(x1)
 
     # Collision channel
-    coll = Dense(output_dim)(x)
+    x2 = Dense(128, activation='relu', name='fc3')(x)
+    x2 = Dropout(0.3)(x2)
+    coll = Dense(output_dim)(x2)
     coll = Activation('sigmoid')(coll)
 
     # Define steering-collision model
