@@ -4,8 +4,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten, Input
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers.merge import add
 from keras import regularizers
-
-
+from keras_applications.resnext import ResNeXt50, ResNet50
 
 def resnet8(img_width, img_height, img_channels, output_dim):
     """
@@ -161,5 +160,67 @@ def vgg(img_width, img_height, img_channels, output_dim):
     # Define steering-collision model
     model = Model(inputs=[img_input], outputs=[steer, coll])
     print(model.summary())
+
+    return model
+
+def resnext50(img_width, img_height, img_channels, output_dim):
+    """
+    Define model architecture.
+    
+    # Arguments
+       img_width: Target image widht.
+       img_height: Target image height.
+       img_channels: Target image channels.
+       output_dim: Dimension of model output.
+       
+    # Returns
+       model: A Model instance.
+    """
+
+    # Input
+    #img_input = Input(shape=(img_height, img_width, img_channels))
+    #cardinality = 32
+    print("Image Channels : ", img_channels)
+    base_model = ResNeXt50(input_tensor=None,
+    					include_top=False,
+    					weights='imagenet',
+                        backend= keras.backend,
+                        layers = keras.layers,
+                        models = keras.models,
+                        utils = keras.utils,
+                       	input_shape=(img_height, img_width, img_channels))
+
+    # Disbaling trainability of resnet feature extraction layers
+    for layer in base_model.layers:
+        layer.trainable = False
+
+    # Printing model summary
+    # print(base_model.summary())
+
+    '''
+    for layer in base_model.layers:
+        # check for convolutional layer
+        if ('Conv2D' not in layer.__class__.__name__):
+            continue
+        # get filter weights
+        filters, biases = layer.get_weights()
+        print(layer.name, filters.shape)
+    ''' 
+
+    x7 = base_model.output
+    x = Flatten()(x7)
+    x = Activation('relu')(x)
+    x = Dropout(0.5)(x)
+
+    # Steering channel
+    steer = Dense(output_dim)(x)
+
+    # Collision channel
+    coll = Dense(output_dim)(x)
+    coll = Activation('sigmoid')(coll)
+
+    # Define steering-collision model
+    model = Model(inputs=base_model.input, outputs=[steer, coll])
+    # print(model.summary())
 
     return model
