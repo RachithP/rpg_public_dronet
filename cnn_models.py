@@ -4,7 +4,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten, Input
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers.merge import add
 from keras import regularizers
-from keras_applications.resnext import ResNeXt50, ResNet50
+from keras.applications.resnext import ResNeXt50, ResNet50
 
 def resnet8(img_width, img_height, img_channels, output_dim):
     """
