@@ -235,7 +235,6 @@ def avgpool_network(img_width, img_height, img_channels, output_dim):
     x5 = Conv2D(128, (1, 1), strides=[2,2], padding='same')(x5)
     x7 = add([x5, x6])
 
-    x7 = AveragePooling2D()(x7)
     x = Flatten()(x7)
     x = Activation('relu')(x)
     x = Dropout(0.5)(x)
@@ -244,6 +243,7 @@ def avgpool_network(img_width, img_height, img_channels, output_dim):
     steer = Dense(output_dim)(x)
 
     # Collision channel
+    x = GlobalAveragePooling2D()(x7)
     coll = Dense(output_dim)(x)
     coll = Activation('sigmoid')(coll)
 
