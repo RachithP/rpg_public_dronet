@@ -40,6 +40,7 @@ class MyCallback(keras.callbacks.Callback):
         logz.log_tabular('train_loss', logs.get('loss'))
         logz.log_tabular('val_loss', logs.get('val_loss'))
         logz.log_tabular('dense_1_loss', logs.get('dense_1_loss'))
+        #Fr inceptionv3 network logz.log_tabular('activation_95_loss', logs.get('activation_95_loss'))
         logz.log_tabular('activation_1_loss', logs.get('activation_1_loss'))
         logz.log_tabular('beta', K.get_value(self.model.beta))
         logz.log_tabular('alpha', K.get_value(self.model.alpha))
