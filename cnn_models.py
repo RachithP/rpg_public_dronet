@@ -199,14 +199,14 @@ def three_block_model_batchnorm(img_width, img_height, img_channels, output_dim)
     x2 = Conv2D(64, (5, 5), activation='relu', padding='same', name='conv_1_block_2',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x1)
-    x2 = keras.layers.normalization.BatchNormalization()(x2
+    x2 = keras.layers.normalization.BatchNormalization()(x2)
     x2 = Conv2D(64, (5, 5), activation='relu', padding='same', name='conv_2_block_2',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x2)
     x2 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_2')(x2)
     
     # Block - 3
-    x2 = keras.layers.normalization.BatchNormalization()(x2
+    x2 = keras.layers.normalization.BatchNormalization()(x2)
     x3 = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv_1_block_3',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x2)
