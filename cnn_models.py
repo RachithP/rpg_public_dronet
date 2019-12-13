@@ -228,15 +228,17 @@ def three_block_model_batchnorm(img_width, img_height, img_channels, output_dim)
     x = Flatten(name='fc1')(x3)
     x = Dropout(0.5)(x)
 
-    x1 = Dense(2048, activation='relu', name='fc2')(x)
+    #x1 = Dense(2048, activation='relu', name='fc2')(x)
+    x1 = Dense(512, activation='relu', name='fc2')(x)
     x1 = Dropout(0.5)(x1)
-    
+
     # Steering channel
     steer = Dense(output_dim)(x1)
 
     # Collision channel
-    x2 = Dense(2048, activation='relu', name='fc3')(x)
-    x2 = Dropout(0.5)(x2)
+    #x2 = Dense(2048, activation='relu', name='fc3')(x)
+    x2 = Dense(128, activation='relu', name='fc3')(x)
+    x2 = Dropout(0.3)(x2)
     coll = Dense(output_dim)(x2)
     coll = Activation('sigmoid')(coll)
 
