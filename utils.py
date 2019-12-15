@@ -3,7 +3,7 @@ import os
 import numpy as np
 import tensorflow as tf
 import json
-
+import time
 from keras import backend as K
 from keras.preprocessing.image import Iterator
 from keras.preprocessing.image import ImageDataGenerator
@@ -268,8 +268,11 @@ def compute_predictions_and_gt(model, generator, steps,
                                  str(generator_output))
         else:
             raise ValueError('Output not valid for current evaluation')
-
+	
+        start_time = time.time()
         outs = model.predict_on_batch(x)
+        time_diff = time.time() - start_time()
+        print("Time Difference: ", time_diff)
         if not isinstance(outs, list):
             outs = [outs]
         if not isinstance(gt_lab, list):
