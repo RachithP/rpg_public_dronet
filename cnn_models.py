@@ -369,8 +369,11 @@ def inceptionv3(img_width, img_height, img_channels, output_dim):
         print(layer.name, filters.shape)
     ''' 
 
-    x = base_model.output
-    x = GlobalAveragePooling2D()(x)
+    x = AveragePooling2D(pool_size=(2, 2))(base_model.output)
+    x = Flatten()(x)
+    x = Activation('relu')(x)
+    x = Dropout(0.4)(x)
+    #x = GlobalAveragePooling2D()(x)
 
     # Steering channel
     steer = Dense(output_dim)(x)
@@ -381,6 +384,6 @@ def inceptionv3(img_width, img_height, img_channels, output_dim):
 
     # Define steering-collision model
     model = Model(inputs=base_model.input, outputs=[steer, coll])
-    # print(model.summary())
+    print(model.summary())
 
     return model
