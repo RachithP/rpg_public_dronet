@@ -1,10 +1,10 @@
 import keras
 from keras.models import Model
 from keras.layers import Dense, Dropout, Activation, Flatten, Input, GlobalAveragePooling2D
-from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Conv2D, MaxPooling2D, UpSampling2D
 from keras.layers import Dense, Dropout, Activation, Flatten, Input
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, GlobalAveragePooling1D, AveragePooling2D
-from keras.layers.merge import add, Concatenate
+from keras.layers.merge import add, Concatenate, concatenate
 from keras import regularizers
 from keras.applications.inception_v3 import InceptionV3
 
@@ -360,17 +360,26 @@ def deep_network(img_width, img_height, img_channels, output_dim):
     x2 = Conv2D(64, (5, 5), activation='relu', padding='same', name='conv_2_block_2',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x2)
+    #x1 = Conv2D(64, (1,1), activation='relu', padding='same')(x1)
+    #x2 = add([x1, x2])
+    #x2 = concatenate([x1, x2])
     x2 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_2')(x2)
     
     # Block - 3
-    x3 = Conv2D(128, (3, 3), activation='relu', name='conv_1_block_3',
+    x3 = Conv2D(64, (3, 3), activation='relu', name='conv_1_block_3', padding='same',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x2)
-    x3 = Conv2D(128, (3, 3), activation='relu', name='conv_2_block_3',
+    x3 = Conv2D(64, (3, 3), activation='relu', name='conv_2_block_3', padding='same',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x3)
     x3 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_3')(x3)
-    
+   
+    x4 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_4')(x1)
+    x4 = concatenate([x4,x2])
+    x4 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_5')(x4)
+    x3 = concatenate([x4, x3])
+
+    #x3 = UpSampling2D()(x3)
     # Block - 4
 #     x4 = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv_1_block_4',
 #                kernel_initializer="he_normal", 
@@ -380,19 +389,22 @@ def deep_network(img_width, img_height, img_channels, output_dim):
 #                 kernel_regularizer=regularizers.l2(1e-4))(x4)
 #     x4 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_4')(x4)
 
+    x3 = Conv2D(16, (1,1), activation='relu', padding='same')(x3)
     x = Flatten(name='fc1')(x3)
+    x = Activation('relu')(x)
     x = Dropout(0.5)(x)
-
-    x1 = Dense(512, activation='relu', name='fc2')(x)
-    x1 = Dropout(0.5)(x1)
+    #x = AveragePooling2D(pool_size=(3,3))(x3)
+    #x1 = Dense(512, activation='relu', name='fc2')(x)
+    #x1 = Dropout(0.5)(x1)
     
     # Steering channel
-    steer = Dense(output_dim)(x1)
+    steer = Dense(output_dim)(x)
 
     # Collision channel
-    x2 = Dense(128, activation='relu', name='fc3')(x)
-    x2 = Dropout(0.3)(x2)
-    coll = Dense(output_dim)(x2)
+    #x2 = Dense(128, activation='relu', name='fc3')(x)
+    #x2 = Dropout(0.3)(x2)
+    x = GlobalAveragePooling2D()(x3)
+    coll = Dense(output_dim)(x)
     coll = Activation('sigmoid')(coll)
 
     # Define steering-collision model
