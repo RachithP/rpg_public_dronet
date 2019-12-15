@@ -31,7 +31,7 @@ def getModel(img_width, img_height, img_channels, output_dim, weights_path):
     """
     # model = cnn_models.resnet8(img_width, img_height, img_channels, output_dim)
     # model = cnn_models.vgg(img_width, img_height, img_channels, output_dim)
-    model = cnn_models.inceptionv3(img_width, img_height, img_channels, output_dim)
+    model = cnn_models.deep_network(img_width, img_height, img_channels, output_dim)
 
     if weights_path:
         try:
