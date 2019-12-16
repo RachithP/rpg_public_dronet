@@ -403,7 +403,7 @@ def deep_network(img_width, img_height, img_channels, output_dim):
     # Collision channel
     #x2 = Dense(128, activation='relu', name='fc3')(x)
     #x2 = Dropout(0.3)(x2)
-    x = GlobalAveragePooling2D()(x3)
+    #x = GlobalAveragePooling2D()(x3)
     coll = Dense(output_dim)(x)
     coll = Activation('sigmoid')(coll)
 
