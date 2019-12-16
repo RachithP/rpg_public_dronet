@@ -25,10 +25,10 @@ class MyCallback(keras.callbacks.Callback):
     def on_epoch_begin(self, epoch, logs=None):
         
         # Decrease weight for binary cross-entropy loss
-        beta_epoch = 10      # Epochs after which beta loss kicks in
+        beta_epoch = 5      # Epochs after which beta loss kicks in
         sess = K.get_session()
-        self.model.beta.load(np.maximum(0.0, 1.0-np.exp(-1.0/beta_epoch*(epoch-beta_epoch))), sess)
-        self.model.alpha.load(1.0, sess)
+        self.model.alpha.load(np.maximum(0.0, 1.0-np.exp(-1.0/beta_epoch*(epoch-beta_epoch))), sess)
+        self.model.beta.load(1.0, sess)
 
         print("alpha = ", self.model.alpha.eval(sess))
         print("beta = ", self.model.beta.eval(sess))
@@ -42,7 +42,7 @@ class MyCallback(keras.callbacks.Callback):
         logz.log_tabular('dense_1_loss', logs.get('dense_1_loss'))
         #Fr inceptionv3 network logz.log_tabular('activation_95_loss', logs.get('activation_95_loss'))
         #for gavgpool_netowkr->logz.log_tabular('activation_8_loss', logs.get('activation_8_loss'))
-        logz.log_tabular('activation_1_loss', logs.get('activation_1_loss'))
+        logz.log_tabular('activation_1_loss', logs.get('activation_2_loss'))
         logz.log_tabular('beta', K.get_value(self.model.beta))
         logz.log_tabular('alpha', K.get_value(self.model.alpha))
         # Track the learning rate updates
