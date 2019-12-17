@@ -80,8 +80,8 @@ def evaluate_regression(predictions, real_values, fname):
             n_errors=20)
     dictionary = {"evas": evas, "rmse": rmse,
                   "highest_errors": highest_errors}
-    print("Results are :", dictionary)
-    # utils.write_to_file(dictionary, fname)
+    #utils.write_to_file(dictionary, fname)
+    return dictionary
 
 
 # Functions to evaluate collision
@@ -161,9 +161,8 @@ def evaluate_classification(pred_prob, pred_labels, real_labels, fname):
     dictionary = {"ave_accuracy": ave_accuracy.tolist(), "precision": precision.tolist(),
                   "recall": recall.tolist(), "f_score": f_score.tolist(),
                   "highest_errors": highest_errors.tolist()}
-    utils.write_to_file(dictionary, fname)
-
-
+    #utils.write_to_file(dictionary, fname)
+    return dictionary
 
 
 def _main():
@@ -222,16 +221,20 @@ def _main():
                   'random_regression.json': random_steerings,
                   'constant_regression.json': constant_steerings}
 
+    steering_dict = []
     # Evaluate predictions: EVA, residuals, and highest errors
     for fname, pred in dict_fname.items():
         abs_fname = os.path.join(FLAGS.experiment_rootdir, fname)
-        evaluate_regression(pred, real_steerings, abs_fname)
+        if fname=='test_regression.json':
+            steering_dict.append(evaluate_regression(pred, real_steerings, abs_fname))
+        else:
+            evaluate_regression(pred, real_steerings, abs_fname)
 
     # Write predicted and real steerings
     dict_test = {'pred_steerings': pred_steerings.tolist(),
                  'real_steerings': real_steerings.tolist()}
-    utils.write_to_file(dict_test,os.path.join(FLAGS.experiment_rootdir,
-                                               'predicted_and_real_steerings.json'))
+    #utils.write_to_file(dict_test,os.path.join(FLAGS.experiment_rootdir,
+    #`                                           'predicted_and_real_steerings.json'))
 
 
 
@@ -250,18 +253,22 @@ def _main():
     # Create dictionary with filenames
     dict_fname = {'test_classification.json': pred_labels,
                   'random_classification.json': random_labels}
+    collision_dict = []
 
     # Evaluate predictions: accuracy, precision, recall, F1-score, and highest errors
     for fname, pred in dict_fname.items():
         abs_fname = os.path.join(FLAGS.experiment_rootdir, fname)
-        evaluate_classification(pred_prob, pred, real_labels, abs_fname)
+        if fname=='test_classification.json':
+            collision_dict.append(evaluate_classification(pred_prob, pred, real_labels, abs_fname))
+        else:
+            evaluate_classification(pred_prob, pred, real_labels, abs_fname)
 
     # Write predicted probabilities and real labels
     dict_test = {'pred_probabilities': pred_prob.tolist(),
                  'real_labels': real_labels.tolist()}
-    utils.write_to_file(dict_test,os.path.join(FLAGS.experiment_rootdir,
-                                               'predicted_and_real_labels.json'))
-
+    #utils.write_to_file(dict_test,os.path.join(FLAGS.experiment_rootdir,
+    #                                           'predicted_and_real_labels.json'))
+    return steering_dict, collision_dict
 
 def main(argv):
     # Utility main to load flags
@@ -270,8 +277,8 @@ def main(argv):
     except gflags.FlagsError:
       print ('Usage: %s ARGS\\n%s' % (sys.argv[0], FLAGS))
       sys.exit(1)
-    _main()
-
+    steering_dict, collision_dict = _main()
+    return steering_dict, collision_dict
 
 if __name__ == "__main__":
     main(sys.argv)
