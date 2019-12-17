@@ -339,12 +339,12 @@ def deep_network(img_width, img_height, img_channels, output_dim):
     x2 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_2')(x2)
     
     # Block - 3
-    x3 = Conv2D(64, (3, 3), activation='relu', name='conv_1_block_3', padding='same',
+    x3 = Conv2D(128, (3, 3), activation='relu', name='conv_1_block_3', padding='same',
                kernel_initializer="he_normal", 
                 kernel_regularizer=regularizers.l2(1e-4))(x2)
-    x3 = Conv2D(64, (3, 3), activation='relu', name='conv_2_block_3', padding='same',
-               kernel_initializer="he_normal", 
-                kernel_regularizer=regularizers.l2(1e-4))(x3)
+    #x3 = Conv2D(128, (3, 3), activation='relu', name='conv_2_block_3', padding='same',
+    #           kernel_initializer="he_normal", 
+    #            kernel_regularizer=regularizers.l2(1e-4))(x3)
     x3 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_3')(x3)
    
     x4 = MaxPooling2D(pool_size=(2, 2), strides=[2,2], name='maxpool_block_4')(x1)
