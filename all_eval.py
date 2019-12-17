@@ -26,7 +26,7 @@ for infile in sorted(glob.glob(folder+"/model_weights*"), key=numericalSort):
     #print("Current File Being Processed is: " + infile)
     infile = infile.replace(folder+"/",'')
     #print("=================After replacing", infile)
-    steering, collision = evaluation.main(["evaluation.py","--experiment_rootdir=model/three_block_model", "--weights_fname="+infile, "--test_dir=../datasets/evaluation_test"])
+    steering, collision = evaluation.main(["evaluation.py","--experiment_rootdir="+folder, "--weights_fname="+infile, "--test_dir=../../dronet/datasets/testing"])
     print("Steering--------:", steering)
     print("Collision-------:", collision)
     print(collision[0]['ave_accuracy'])
